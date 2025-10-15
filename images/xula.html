@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Xavier University of Louisiana</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <nav class="nav">
+      <a class="nav__brand" href="me.html">My Site</a>
+      <div class="nav__links">
+        <a class="nav__link" href="me.html">Me</a>
+        <a class="nav__link" href="xula.html">XULA</a>
+        <a class="nav__link" href="dillard.html">Dillard</a>
+        <a class="nav__link" href="other_university.html">Other Univ</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <img class="hero__img" src="images/me.jpg" alt="Your name portrait" />
+      <div class="hero__text">
+        <h1 class="title">Xavier University of Louisiana</h1>
+        <p class="lead">The Center’s mission is to engage, to support, and to promote innovative thinking in a multiplicity of contexts and across disciplines regarding race, class, systemic inequities; and a faith that does justice toward a better understanding of issues impacting modern societies and vexing the human spirit.
+
+        </p>
+        <a class="btn" href="mailto:you@example.com">Visit Xula</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card__title">Mission</h2>
+      <p>
+        The Center for Equity, Justice, and the Human Spirit at Xavier University of Louisiana is a vibrant and critical research, teaching, and public engagement initiative. The Center’s mission is to engage, to support, and to promote innovative thinking in a multiplicity of contexts and across disciplines regarding race, class, systemic inequities; and a faith that does justice toward a better understanding of issues impacting modern societies and vexing the human spirit.
+
+In keeping with the mission of Xavier, the Center organizes conferences, seminars, lectures, and community convenings that bring together relevant experts, faculty, undergraduate and graduate students, and community members with diverse interests and backgrounds.
+
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <small>© <span id="year"></span>Darion Dawson</small>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
