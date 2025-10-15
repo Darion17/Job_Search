@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Me</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <nav class="nav">
+      <a class="nav__brand" href="me.html">My Site</a>
+      <div class="nav__links">
+        <a class="nav__link" href="me.html">Me</a>
+        <a class="nav__link" href="xula.html">XULA</a>
+        <a class="nav__link" href="dillard.html">Dillard</a>
+        <a class="nav__link" href="other_university.html">Other Univ</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <img class="hero__img" src="images/me.jpg" alt="Your name portrait" />
+      <div class="hero__text">
+        <h1 class="title">Your Name</h1>
+        <p class="lead">Brief bio about you — 2–4 sentences.</p>
+        <a class="btn" href="mailto:you@example.com">Contact Me</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card__title">About Me</h2>
+      <p>
+        Add a paragraph about your interests, major, and goals.
+      </p>
+    </section>
+
+    <blockquote class="quote">
+      <p>“Optional inspirational line or motto.”</p>
+      <cite>— You</cite>
+    </blockquote>
+  </main>
+
+  <footer class="site-footer">
+    <small>© <span id="year"></span> Your Name</small>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
