@@ -1,7 +1,12 @@
-package Job_Search;
-
 
 public class Scraper {
+    public static void main(String[] args) {
+        System.out.println(FG_GREEN + ASCII_WELCOME + RESET);
+        System.out.println(BOLD + FG_CYAN + "Welcome to Job_Search!" + RESET);
+        System.out.println();
+        System.out.println(FG_YELLOW + "What does this app do?" + RESET);
+        System.out.println(explainPurpose());
+    }
 
     static final String RESET = "\u001B[0m";
     static final String BOLD = "\u001B[1m";
@@ -29,13 +34,5 @@ public class Scraper {
             "",
             "Tip: Keep your repo private and add your instructor as a collaborator."
         );
-    }
-
-    public static void main(String[] args) {
-        System.out.println(FG_GREEN + ASCII_WELCOME + RESET);
-        System.out.println(BOLD + FG_CYAN + "Welcome to Job_Search!" + RESET);
-        System.out.println();
-        System.out.println(FG_YELLOW + "What does this app do?" + RESET);
-        System.out.println(explainPurpose());
     }
 }
