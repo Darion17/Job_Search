@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Howard University</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <nav class="nav">
+      <a class="nav__brand" href="me.html">My Site</a>
+      <div class="nav__links">
+        <a class="nav__link" href="me.html">Me</a>
+        <a class="nav__link" href="xula.html">XULA</a>
+        <a class="nav__link" href="dillard.html">Dillard</a>
+        <a class="nav__link" href="other_university.html">Other Univ</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <img class="hero__img" src="images/me.jpg" alt="Your name portrait" />
+      <div class="hero__text">
+        <h1 class="title">Howard University</h1>
+        <p class="lead">Howard University, a culturally diverse, comprehensive, research intensive and historically Black private university, provides an educational experience of exceptional quality at the undergraduate, graduate, and professional levels to students of high academic standing and potential, with particular emphasis upon educational opportunities for Black students
+        </p>
+        <a class="btn" href="https://www.dillard.edu">Visit Dillard</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card__title">Mission</h2>
+      <p>
+        Howard University, a culturally diverse, comprehensive, research intensive and historically Black private university, provides an educational experience of exceptional quality at the undergraduate, graduate, and professional levels to students of high academic standing and potential, with particular emphasis upon educational opportunities for Black students.
+         Moreover, the University is dedicated to attracting and sustaining a cadre of faculty who are, through their teaching, research and service, committed to the development of distinguished, historically aware, and compassionate graduates and to the discovery of solutions to human problems in the United States and throughout the world. 
+         With an abiding interest in both domestic and international affairs, the University is committed to continuing to produce leaders for America and the global community.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <small>© <span id="year"></span>Darion Dawson</small>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
