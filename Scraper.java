@@ -1,4 +1,5 @@
 
+
 public class Scraper {
     public static void main(String[] args) {
         System.out.println(FG_GREEN + ASCII_WELCOME + RESET);
@@ -35,4 +36,5 @@ public class Scraper {
             "Tip: Keep your repo private and add your instructor as a collaborator."
         );
     }
+
 }
