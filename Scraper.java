@@ -14,10 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
 public class Scraper {
     
-
     static final String RESET = "\u001B[0m";
     static final String BOLD = "\u001B[1m";
     static final String FG_GREEN = "\u001B[32m";
@@ -44,7 +42,6 @@ public class Scraper {
             "",
             "Tip: Keep your repo private and add your instructor as a collaborator."
         );
-    }
     }
 
     public static void main(String[] args) {
@@ -154,4 +151,28 @@ static String scrapeXulaMission() throws IOException {
         }
         return text;
     }
+
+     static String scrapeUniversityMission(String url, String containerSelector) throws IOException {
+        Document doc = fetch(url);
+        if (containerSelector != null && !containerSelector.isBlank()) {
+            Element node = doc.selectFirst(containerSelector);
+            if (node != null) return clean(node.text());
+        }
+        Element head = doc.selectFirst("h1:matchesOwn((?i)mission), h2:matchesOwn((?i)mission), h3:matchesOwn((?i)mission)");
+        if (head != null) {
+            StringBuilder sb = new StringBuilder();
+            Element sib = head.nextElementSibling();
+            int grabbed = 0;
+            while (sib != null && grabbed < 8) {
+                if (List.of("p","div","section").contains(sib.tagName().toLowerCase())) {
+                    sb.append(" ").append(sib.text());
+                    grabbed++;
+                }
+                sib = sib.nextElementSibling();
+            }
+            return clean(sb.toString());
+        }
+        return clean(doc.text());
+    }
+}
 
