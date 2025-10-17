@@ -1,0 +1,5 @@
+{
+  "java.project.referencedLibraries": [
+    "jsoup-1.18.1.jar"
+  ]
+}
