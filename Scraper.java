@@ -174,5 +174,72 @@ static String scrapeXulaMission() throws IOException {
         }
         return clean(doc.text());
     }
+    static java.util.List<String[]> scrapeFakeJobs() throws java.io.IOException {
+    String url = "https://realpython.github.io/fake-jobs/";
+    org.jsoup.nodes.Document doc = fetch(url);
+
+    java.util.List<String[]> rows = new java.util.ArrayList<>();
+    // (We will prepend the header when writing CSV)
+    for (org.jsoup.nodes.Element card : doc.select("div.card-content")) {
+        org.jsoup.nodes.Element titleEl   = card.selectFirst("h2.title");
+        org.jsoup.nodes.Element companyEl = card.selectFirst("h3.subtitle");
+        org.jsoup.nodes.Element locationEl= card.selectFirst("p.location");
+        org.jsoup.nodes.Element dateEl    = card.selectFirst("time");
+
+        String title   = titleEl   != null ? clean(titleEl.text())    : "";
+        String company = companyEl != null ? clean(companyEl.text())  : "";
+        String location= locationEl!= null ? clean(locationEl.text()) : "";
+        String datePosted = "";
+        if (dateEl != null) {
+            String dt = dateEl.hasAttr("datetime") ? dateEl.attr("datetime") : dateEl.text();
+            datePosted = clean(dt);
+        }
+
+        if (!title.isEmpty() && !company.isEmpty()) {
+            rows.add(new String[]{ title, company, location, datePosted });
+        }
+    }
+    return rows;
+}
+
+static void writeCsv(java.nio.file.Path out, java.util.List<String[]> rows) {
+    // ensure parent folder exists
+    try {
+        java.nio.file.Path parent = out.getParent();
+        if (parent != null) java.nio.file.Files.createDirectories(parent);
+    } catch (java.io.IOException ignored) {}
+
+    try (java.io.BufferedWriter bw = java.nio.file.Files.newBufferedWriter(
+            out, java.nio.charset.StandardCharsets.UTF_8)) {
+        // required header
+        bw.write(csvLine(new String[]{ "Job Title", "Company", "Location", "Date Posted" }));
+        bw.newLine();
+        // data rows
+        for (String[] r : rows) {
+            bw.write(csvLine(r));
+            bw.newLine();
+        }
+    } catch (java.io.IOException e) {
+        throw new java.io.UncheckedIOException(e);
+    }
+}
+
+// minimal CSV escaping: wrap if contains comma/quote/newline, double quotes inside
+static String csvLine(String[] fields) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < fields.length; i++) {
+        if (i > 0) sb.append(',');
+        sb.append(escapeCsv(fields[i]));
+    }
+    return sb.toString();
+}
+
+static String escapeCsv(String s) {
+    if (s == null) return "";
+    boolean needsQuote = s.contains(",") || s.contains("\"") || s.contains("\n") || s.contains("\r");
+    String t = s.replace("\"", "\"\"");
+    return needsQuote ? "\"" + t + "\"" : t;
+}
+
 }
 
