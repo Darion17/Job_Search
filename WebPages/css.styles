@@ -1,0 +1,132 @@
+/* 1) CSS Reset / base */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+/* 2) Page shell */
+.page {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  line-height: 1.6;
+  color: #0f172a;           /* slate-900 */
+  background: #f8fafc;      /* slate-50 */
+}
+
+/* 3) Container utility */
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1.25rem;
+}
+
+/* 4) Header / Nav */
+.site-header {
+  background: white;
+  border-bottom: 1px solid #e2e8f0; /* slate-200 */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .75rem 1rem;
+}
+
+.nav__brand {
+  font-weight: 700;
+  text-decoration: none;
+  color: #111827;
+}
+
+.nav__links { display: flex; gap: .75rem; }
+
+.nav__link {
+  text-decoration: none;
+  color: #334155; /* slate-700 */
+  padding: .35rem .6rem;
+  border-radius: .5rem;
+  transition: background .2s ease, color .2s ease;
+}
+.nav__link:hover { background: #e2e8f0; color: #0f172a; }
+
+/* 5) Hero section */
+.hero {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 1.25rem;
+  align-items: center;
+  background: linear-gradient(180deg, #ffffff, #f1f5f9);
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.hero__img {
+  width: 160px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: .75rem;
+  border: 3px solid #cbd5e1; /* slate-300 */
+}
+
+.hero__text { display: grid; gap: .5rem; }
+
+/* 6) Typography utilities */
+.title { font-size: clamp(1.6rem, 2.5vw, 2rem); margin: 0; }
+.lead  { font-size: 1.05rem; color: #475569; }
+
+/* 7) Button */
+.btn {
+  display: inline-block;
+  padding: .55rem .9rem;
+  border-radius: .65rem;
+  background: #1d4ed8; /* blue-700 */
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  transition: transform .06s ease, opacity .2s ease;
+}
+.btn:hover { opacity: .9; }
+.btn:active { transform: translateY(1px); }
+
+/* 8) Card */
+.card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1rem;
+  margin: 1rem 0;
+  box-shadow: 0 1px 0 rgba(0,0,0,.02);
+}
+.card__title { margin: 0 0 .5rem; font-size: 1.25rem; }
+
+/* 9) Quote block */
+.quote {
+  border-left: 4px solid #1d4ed8;
+  padding: .75rem 1rem;
+  background: #eef2ff; /* indigo-50 */
+  color: #1e293b;      /* slate-800 */
+  border-radius: .5rem;
+  margin: 1rem 0;
+}
+
+/* 10) Footer */
+.site-footer {
+  text-align: center;
+  color: #64748b; /* slate-500 */
+  padding: 2rem 1rem 3rem;
+}
+
+/* 11) Responsive tweak */
+@media (max-width: 640px) {
+  .hero { grid-template-columns: 1fr; text-align: center; }
+  .hero__img { margin: 0 auto; }
+}
+
+/* 12) Reusable helpers */
+.mt-2 { margin-top: .5rem; }
+.mb-2 { margin-bottom: .5rem; }
+.rounded { border-radius: .75rem; }
+.shadow-sm { box-shadow: 0 1px 2px rgba(0,0,0,.05); }
