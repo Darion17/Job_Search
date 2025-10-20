@@ -53,22 +53,35 @@ public class Scraper {
         System.out.println();
 
         boolean doXula = false;
-        boolean doHoward = false; // new flag
+        boolean doHoward = false;
         boolean doJobs = false;
         String otherUrl = null;
+
+        Integer sinceDays = null;
+        boolean unique = false;
+        boolean sortDesc = false;
+        String keyword = null;
         Path outPath = Path.of("fake_jobs.csv");
 
         for (String a : args) {
             if (a.equalsIgnoreCase("--xula"))
                 doXula = true;
             else if (a.equalsIgnoreCase("--howard"))
-                doHoward = true; // enable Howard explicitly
+                doHoward = true;
             else if (a.equalsIgnoreCase("--jobs"))
                 doJobs = true;
             else if (a.startsWith("--other-url="))
                 otherUrl = a.substring("--other-url=".length());
             else if (a.startsWith("--out="))
                 outPath = Path.of(a.substring("--out=".length()));
+            else if (a.startsWith("--since-days="))
+                sinceDays = Integer.parseInt(a.substring("--since-days=".length()));
+            else if (a.equalsIgnoreCase("--unique"))
+                unique = true;
+            else if (a.equalsIgnoreCase("--sort-desc"))
+                sortDesc = true;
+            else if (a.startsWith("--keyword="))
+                keyword = a.substring("--keyword=".length());
         }
 
         try {
@@ -82,7 +95,7 @@ public class Scraper {
             if (doHoward) {
                 String howard = scrapeHowardMission();
                 System.out.println(BOLD + "[Howard Mission]" + RESET);
-                System.out.println(howard); // print full text, no truncation
+                System.out.println(howard);
                 System.out.println();
             }
 
@@ -94,8 +107,9 @@ public class Scraper {
             }
 
             if (doJobs) {
-                List<String[]> rows = scrapeFakeJobs();
-                writeCsv(outPath, rows);
+                List<String[]> rows = scrapeFakeJobs(); // data rows only (no header)
+                rows = processJobs(rows, unique, sinceDays, keyword, sortDesc); // NEW
+                writeCsv(outPath, rows); // writes header + rows
                 System.out.println(BOLD + ("Wrote " + rows.size() + " rows to " + outPath.toAbsolutePath()) + RESET);
             }
 
@@ -104,7 +118,13 @@ public class Scraper {
                 System.out.println("  java Scraper --xula");
                 System.out.println("  java Scraper --howard");
                 System.out.println("  java Scraper --other-url=https://example.edu/mission");
-                System.out.println("  java Scraper --jobs [--out=fake_jobs.csv]");
+                System.out.println(
+                        "  java Scraper --jobs [--out=fake_jobs.csv] [--unique] [--since-days=30] [--keyword=engineer] [--sort-desc]");
+                System.out.println();
+                System.out.println("Examples:");
+                System.out.println("  java Scraper --xula --howard");
+                System.out.println(
+                        "  java Scraper --jobs --out=fake_jobs.csv --unique --since-days=30 --keyword=engineer --sort-desc");
             }
         } catch (IOException e) {
             System.err.println("Network or I/O error: " + e.getMessage());
@@ -139,7 +159,6 @@ public class Scraper {
         String url = "https://www.xula.edu/about/mission-values.html";
         Document doc = fetch(url);
 
-        // prefer the assignment's container, broaden slightly
         Element container = doc.selectFirst("div.editorarea, .editorarea, main .field--name-body, main article");
         String text = (container != null) ? clean(container.text())
                 : extractMissionSection(doc);
@@ -152,10 +171,6 @@ public class Scraper {
         text = removeNavNoise(text);
         text = dedupeSentences(text);
 
-        // (optional) the assignment hint mentions the phrase being on the page
-        // if (!text.contains("founded by Saint") && doc.text().contains("founded by
-        // Saint")) { /* ok */ }
-
         return text;
     }
 
@@ -163,11 +178,9 @@ public class Scraper {
         String url = "https://howard.edu/about/mission";
         Document doc = fetch(url);
 
-        // 1) Try to extract the exact mission paragraph by markers (most reliable for
-        // grading)
         String page = clean(doc.text());
         String startMarker = "Howard University, a culturally diverse";
-        String endMarker = "global community."; // final sentence ends with this
+        String endMarker = "global community.";
 
         int start = page.indexOf(startMarker);
         if (start >= 0) {
@@ -178,9 +191,6 @@ public class Scraper {
             }
         }
 
-        // 2) If markers fail (site changed), fall back to container → heading → whole
-        // page,
-        // then trim and clean to avoid menus/links.
         Element container = doc.selectFirst(
                 "main .field--name-body, main article, main .rich-text, main .wysiwyg, .compartment .rich-text, .compartment");
         String text = (container != null) ? clean(container.text()) : extractMissionSection(doc);
@@ -191,8 +201,6 @@ public class Scraper {
         text = removeNavNoise(text);
         text = dedupeSentences(text);
 
-        // 3) As a last polish: if our fallback still contains the mission paragraph,
-        // re-slice to that paragraph.
         start = text.indexOf(startMarker);
         int end = text.indexOf(endMarker, Math.max(0, start));
         if (start >= 0 && end > 0) {
@@ -239,7 +247,7 @@ public class Scraper {
         }
 
         try (var bw = Files.newBufferedWriter(out, StandardCharsets.UTF_8)) {
-            // header required by assignment
+
             bw.write(csvLine(new String[] { "Job Title", "Company", "Location", "Date Posted" }));
             bw.newLine();
             for (String[] r : rows) {
@@ -270,7 +278,7 @@ public class Scraper {
     }
 
     // ---------- Helpers (define once; used by all scrapers) ----------
-    // From "Mission" heading to the next heading (collect paragraphs/divs/sections)
+
     static String extractMissionSection(Document doc) {
         Element head = doc.selectFirst(
                 "h1:matchesOwn((?i)mission), h2:matchesOwn((?i)mission), h3:matchesOwn((?i)mission)");
@@ -281,7 +289,7 @@ public class Scraper {
         for (Element sib = head.nextElementSibling(); sib != null; sib = sib.nextElementSibling()) {
             String tag = sib.tagName().toLowerCase();
             if (tag.matches("h[1-6]"))
-                break; // stop at next section
+                break;
             if (tag.equals("p") || tag.equals("div") || tag.equals("section") || tag.equals("article")) {
                 sb.append(' ').append(sib.text());
             }
@@ -336,31 +344,101 @@ public class Scraper {
                 cut = i;
         }
         String trimmed = s.substring(0, cut).trim();
-        return trimmed.length() >= 140 ? trimmed : s; // keep at least ~1 paragraph
+        return trimmed.length() >= 140 ? trimmed : s;
     }
 
     static String scrapeUniversityMission(String url, String containerSelector) throws IOException {
         Document doc = fetch(url);
 
-        // 1) If caller provides a container selector, try that first
         if (containerSelector != null && !containerSelector.isBlank()) {
             Element node = doc.selectFirst(containerSelector);
             if (node != null)
                 return clean(node.text());
         }
 
-        // 2) Fallback: from "Mission" heading to the next heading
         String text = extractMissionSection(doc);
 
-        // 3) Last resort: whole page text
         if (text == null || text.isBlank())
             text = clean(doc.text());
 
-        // 4) Trim likely spillover and polish
         text = safeCut(text, "Core Values", "Values", "Vision", "Learn More", "Section Menu", "Back to Home");
         text = removeNavNoise(text);
         text = dedupeSentences(text);
         return text;
+    }
+
+    static List<String[]> processJobs(
+            List<String[]> rows, boolean unique, Integer sinceDays, String keyword, boolean sortDesc) {
+
+        // rows: [title, company, location, datePosted]
+        List<String[]> out = new ArrayList<>(rows);
+
+        // (a) keyword filter (in title/company/location, case-insensitive)
+        if (keyword != null && !keyword.isBlank()) {
+            String needle = keyword.toLowerCase();
+            out.removeIf(r -> {
+                String t = (r[0] == null ? "" : r[0]).toLowerCase();
+                String c = (r[1] == null ? "" : r[1]).toLowerCase();
+                String l = (r[2] == null ? "" : r[2]).toLowerCase();
+                return !(t.contains(needle) || c.contains(needle) || l.contains(needle));
+            });
+        }
+
+        // (b) date filter (keep last N days)
+        if (sinceDays != null && sinceDays > 0) {
+            java.time.LocalDate cutoff = java.time.LocalDate.now().minusDays(sinceDays);
+            out.removeIf(r -> {
+                java.time.LocalDate d = parseDateSafe(r[3]);
+                return d == null || d.isBefore(cutoff);
+            });
+        }
+
+        // (c) dedupe on Title+Company+Location
+        if (unique) {
+            java.util.LinkedHashSet<String> seen = new java.util.LinkedHashSet<>();
+            List<String[]> uniq = new ArrayList<>();
+            for (String[] r : out) {
+                String key = (r[0] + "||" + r[1] + "||" + r[2]).toLowerCase();
+                if (seen.add(key))
+                    uniq.add(r);
+            }
+            out = uniq;
+        }
+
+        // (d) sort by date (desc = newest first)
+        if (sortDesc) {
+            out.sort((a, b) -> {
+                java.time.LocalDate da = parseDateSafe(a[3]);
+                java.time.LocalDate db = parseDateSafe(b[3]);
+                if (da == null && db == null)
+                    return 0;
+                if (da == null)
+                    return 1;
+                if (db == null)
+                    return -1;
+                return db.compareTo(da);
+            });
+        }
+
+        return out;
+    }
+
+    // Parse ISO-like dates safely (e.g., "2020-07-08"); returns null if unknown
+    static java.time.LocalDate parseDateSafe(String s) {
+        if (s == null || s.isBlank())
+            return null;
+        try {
+            // Most fake jobs use ISO-8601 (yyyy-MM-dd). If not, add more parsers.
+            return java.time.LocalDate.parse(s);
+        } catch (Exception ignored) {
+            // Try a looser parse if needed (e.g., "July 8, 2020")
+            try {
+                java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter.ofPattern("MMMM d, uuuu");
+                return java.time.LocalDate.parse(s, fmt);
+            } catch (Exception ignored2) {
+                return null;
+            }
+        }
     }
 
 }
